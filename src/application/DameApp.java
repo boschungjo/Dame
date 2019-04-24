@@ -12,7 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 
-public class Main extends Application {
+public class DameApp extends Application {
 	private Stage fenster;
 	private Scene scene;
 	//private Button[] whiteButtons = new Button[32];
