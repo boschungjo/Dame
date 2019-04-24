@@ -15,6 +15,8 @@ public class Stein extends StackPane {
 	// Konstruktor
 	public Stein(SteinTyp typ, int x, int y) {
 		this.typ = typ;
+		
+		bewege(x, y);
 
 		// SteinHintergrund erzeugen
 		Ellipse bg = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);

@@ -14,7 +14,7 @@ public class Feld extends Rectangle {
 		setHeight(DameApp.FELDGROESSE);
 
 		relocate(x * DameApp.FELDGROESSE, y * DameApp.FELDGROESSE);
-		setFill(leicht ? Color.valueOf("#994C00") : Color.valueOf("#F5DEB3"));
+		setFill(leicht ? Color.valueOf("#F5DEB3") : Color.valueOf("#994C00"));
 	}
 
 	public boolean hatStein() {
