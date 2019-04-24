@@ -1,18 +1,37 @@
 package application;
-	
-import javax.swing.LayoutFocusTraversalPolicy;
 
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
-
+import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.layout.Pane;
+import view.Feld;
 
 public class DameApp extends Application {
+	public static final int FELDGROESSE = 100;
+	public static final int BREITE = 8;
+	public static final int HOEHE = 8;
+	
+	private Feld[][] brett = new Feld[BREITE][HOEHE]; 
+	
+	private Group feldGruppe = new Group();
+	private Group steinGruppe = new Group();
+	
+	private Parent erstelleFenster() {
+		Pane root = new Pane();
+		root.setPrefSize(BREITE * FELDGROESSE, HOEHE * FELDGROESSE);
+		root.getChildren().addAll(feldGruppe, steinGruppe);
+		
+		
+		for(int y = 0; y < HOEHE; y++) {
+			for(int x = 0; x < BREITE; x++) {
+				Feld feld = new Feld();
+				brett[x][y] = feld;
+				
+				feldGruppe.getChildren().add(feld);
+			}
+		}
+	}
+	
+	
 	private Stage fenster;
 	private Scene scene;
 	//private Button[] whiteButtons = new Button[32];
