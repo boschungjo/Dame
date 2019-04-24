@@ -129,7 +129,7 @@ public class DameApp extends Application {
 				break;
 			}
 		});
-		
+
 		return stein;
 	}
 
