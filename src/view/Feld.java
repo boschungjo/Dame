@@ -7,11 +7,8 @@ import application.DameApp;
 public class Feld extends Rectangle {
 
 	private Stein stein;
-
-	public boolean hatStein() {
-		return stein != null;
-	}
-
+	
+	//Konstruktor
 	public Feld(boolean leicht, int x, int y) {
 		setWidth(DameApp.FELDGROESSE);
 		setHeight(DameApp.FELDGROESSE);
@@ -19,6 +16,12 @@ public class Feld extends Rectangle {
 		relocate(x * DameApp.FELDGROESSE, y * DameApp.FELDGROESSE);
 		setFill(leicht ? Color.valueOf("#994C00") : Color.valueOf("#F5DEB3"));
 	}
+
+	public boolean hatStein() {
+		return stein != null;
+	}
+
+	
 
 	public Stein getStein() {
 		return stein;
