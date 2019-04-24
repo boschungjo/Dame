@@ -19,6 +19,51 @@ public class DameApp extends Application {
 
 	private Group feldGruppe = new Group();
 	private Group steinGruppe = new Group();
+	
+	private int zuBrett(double pixel) {
+		return (int) (pixel + FELDGROESSE / 2) / FELDGROESSE;
+	}
+
+	private Stein macheStein(SteinTyp typ, int x, int y) {
+		Stein stein = new Stein(typ, x, y);
+		stein.setOnMouseReleased(event -> {
+			int neuX = zuBrett(stein.getLayoutX());
+			int neuY = zuBrett(stein.getLayoutY());
+
+			BewegungsErgebnis ergebnis;
+
+			if (neuX < 0 || neuY < 0 || neuX >= BREITE || neuY >= HOEHE) {
+				ergebnis = new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+			} else {
+				ergebnis = versucheBewegung(stein, neuX, neuY);
+			}
+
+			int x0 = zuBrett(stein.getAltX());
+			int y0 = zuBrett(stein.getAltY());
+
+			switch (ergebnis.getTyp()) {
+			case VERBOTEN:
+				stein.illegaleBewegung();
+				break;
+			case NORMAL:
+				stein.bewege(neuX, neuY);
+				brett[x0][y0].setStein(null);
+				brett[neuX][neuY].setStein(stein);
+				break;
+			case FRESSEN:
+				stein.bewege(neuX, neuY);
+				brett[x0][y0].setStein(null);
+				brett[neuX][neuY].setStein(stein);
+
+				Stein andererStein = ergebnis.getStein();
+				brett[zuBrett(andererStein.getAltX())][zuBrett(andererStein.getAltY())].setStein(null);
+				steinGruppe.getChildren().remove(andererStein);
+				break;
+			}
+		});
+
+		return stein;
+	}
 
 	private Parent erstelleFenster() {
 		Pane root = new Pane();
@@ -88,50 +133,7 @@ public class DameApp extends Application {
 		return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 	}
 
-	private int zuBrett(double pixel) {
-		return (int) (pixel + FELDGROESSE / 2) / FELDGROESSE;
-	}
-
-	private Stein macheStein(SteinTyp typ, int x, int y) {
-		Stein stein = new Stein(typ, x, y);
-		stein.setOnMouseReleased(event -> {
-			int neuX = zuBrett(stein.getLayoutX());
-			int neuY = zuBrett(stein.getLayoutY());
-
-			BewegungsErgebnis ergebnis;
-
-			if (neuX < 0 || neuY < 0 || neuX >= BREITE || neuY >= HOEHE) {
-				ergebnis = new BewegungsErgebnis(BewegungTyp.VERBOTEN);
-			} else {
-				ergebnis = versucheBewegung(stein, neuX, neuY);
-			}
-
-			int x0 = zuBrett(stein.getAltX());
-			int y0 = zuBrett(stein.getAltY());
-
-			switch (ergebnis.getTyp()) {
-			case VERBOTEN:
-				stein.illegaleBewegung();
-				break;
-			case NORMAL:
-				stein.bewege(neuX, neuY);
-				brett[x0][y0].setStein(null);
-				brett[neuX][neuY].setStein(stein);
-				break;
-			case FRESSEN:
-				stein.bewege(neuX, neuY);
-				brett[x0][y0].setStein(null);
-				brett[neuX][neuY].setStein(stein);
-
-				Stein andererStein = ergebnis.getStein();
-				brett[zuBrett(andererStein.getAltX())][zuBrett(andererStein.getAltY())].setStein(null);
-				steinGruppe.getChildren().remove(andererStein);
-				break;
-			}
-		});
-		
-		return stein;
-	}
+	
 
 	public static void main(String[] args) {
 		launch(args);
