@@ -9,14 +9,16 @@ import static application.DameApp.FELDGROESSE;
 import application.DameApp;
 
 public class Stein extends StackPane {
+	private SteinFarbe farbe;
 	private SteinTyp typ;
 
 	private double mausX, mausY;
 	private double altX, altY;
 
 	// Konstruktor
-	public Stein(SteinTyp typ, int x, int y) {
-		this.typ = typ;
+	public Stein(SteinFarbe farbe, int x, int y) {
+		this.farbe = farbe;
+		this.typ = SteinTyp.NORMAL;
 
 		bewege(x, y);
 
@@ -34,7 +36,7 @@ public class Stein extends StackPane {
 
 		// Stein erzeugen
 		Ellipse ellipse = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);
-		ellipse.setFill(typ == SteinTyp.ROT ? Color.valueOf("#c40003") : Color.valueOf("#fff9f4"));
+		ellipse.setFill(farbe == SteinFarbe.ROT ? Color.valueOf("#c40003") : Color.valueOf("#fff9f4"));
 
 		// Umrandung der Steine
 		ellipse.setStroke(Color.BLACK);
@@ -67,48 +69,38 @@ public class Stein extends StackPane {
 	}
 
 	public void werdeDame() {
-		if (this.typ == SteinTyp.WEISS) {
-			this.typ = SteinTyp.DAMEWEISS;
-			System.out.println("Dame");
-			System.out.println(this.getType());
 
-			// oberer Stein erzeugen
-			Ellipse ellipse = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);
+		this.typ = SteinTyp.DAME;
+//		System.out.println(this.getType());
+//		System.out.println("Dame");
+		
+		// oberer Stein erzeugen
+		Ellipse ellipse = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);
+
+		if (this.getFarbe() == SteinFarbe.WEISS) {
 			ellipse.setFill(Color.valueOf("#fff9f4"));
-
-			// Umrandung des oberen Steins
-			ellipse.setStroke(Color.BLACK);
-			ellipse.setStrokeWidth(FELDGROESSE * 0.03);
-
-			// Stein verschieben
-			ellipse.setTranslateX(10);
-			ellipse.setTranslateY(20);
-
-			this.getChildren().addAll(ellipse);
-
 		} else {
-			this.typ = SteinTyp.DAMEROT;
-			System.out.println("Dame");
-
-			// oberer Stein erzeugen
-			Ellipse ellipse = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);
 			ellipse.setFill(Color.valueOf("#c40003"));
-
-			// Umrandung des oberen Steins
-			ellipse.setStroke(Color.BLACK);
-			ellipse.setStrokeWidth(FELDGROESSE * 0.03);
-
-			// Stein verschieben
-			ellipse.setTranslateX(10);
-			ellipse.setTranslateY(20);
-
-			this.getChildren().addAll(ellipse);
 		}
+
+		// Umrandung des oberen Steins
+		ellipse.setStroke(Color.BLACK);
+		ellipse.setStrokeWidth(FELDGROESSE * 0.03);
+
+		// Stein verschieben
+		ellipse.setTranslateX(10);
+		ellipse.setTranslateY(20);
+
+		this.getChildren().add(ellipse);
 	}
 
 	// Getter
 	public SteinTyp getType() {
 		return typ;
+	}
+
+	public SteinFarbe getFarbe() {
+		return farbe;
 	}
 
 	public double getAltX() {

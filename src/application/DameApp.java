@@ -2,7 +2,6 @@ package application;
 
 import control.*;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,13 +18,13 @@ public class DameApp extends Application {
 
 	private Group feldGruppe = new Group();
 	private Group steinGruppe = new Group();
-	
+
 	private int zuBrett(double pixel) {
 		return (int) (pixel + FELDGROESSE / 2) / FELDGROESSE;
 	}
 
-	private Stein macheStein(SteinTyp typ, int x, int y) {
-		Stein stein = new Stein(typ, x, y);
+	private Stein macheStein(SteinFarbe farbe, int x, int y) {
+		Stein stein = new Stein(farbe, x, y);
 		stein.setOnMouseReleased(event -> {
 			int neuX = zuBrett(stein.getLayoutX());
 			int neuY = zuBrett(stein.getLayoutY());
@@ -80,11 +79,11 @@ public class DameApp extends Application {
 				Stein stein = null;
 
 				if (y <= 2 && (x + y) % 2 != 0) {
-					stein = macheStein(SteinTyp.ROT, x, y);
+					stein = macheStein(SteinFarbe.ROT, x, y);
 				}
 
 				if (y >= 5 && (x + y) % 2 != 0) {
-					stein = macheStein(SteinTyp.WEISS, x, y);
+					stein = macheStein(SteinFarbe.WEISS, x, y);
 				}
 
 				if (stein != null) {
@@ -121,39 +120,64 @@ public class DameApp extends Application {
 		int x0 = zuBrett(stein.getAltX());
 		int y0 = zuBrett(stein.getAltY());
 
-		// man darf nur 1 Feld fahren und nur in die erlaubte Richtung
-		if (Math.abs(neuX - x0) == 1 && (neuY - y0 == stein.getType().richtung || stein.getType().richtung == 0)) {
+		// man darf nur 1 Feld fahren und nur in die erlaubte Richtung (ausser Dame)
+		if ((Math.abs(neuX - x0) == 1 && neuY - y0 == stein.getFarbe().richtung) || (stein.getType() == SteinTyp.DAME && ((neuY -neuX == y0 - x0) || (neuX + neuY == x0 + y0) ))) {
+			
+//			int summe = neuX + neuY;
+//			int dif = neuY - neuX;
+//			if (stein.getType() == SteinTyp.DAME) {
+//				for (int x = 0; x < brett.length; x++) {
+//				for (int y = 0; y < brett.length; y++) {
+//					if (brett[x][y].hatStein() && brett[x][y].getStein().getFarbe() != stein.getFarbe() && (x + y == summe || y - x == dif)) {
+//						return new BewegungsErgebnis(BewegungTyp.FRESSEN,brett[x][y].getStein());
+//					}
+//				}
+//			}
+//			}
+			
+			
+			if (stein.getType() == SteinTyp.DAME) {
+				if (brett[neuX+1][neuY+1].hatStein()) {
+					return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[neuX+1][neuY+1].getStein());
+				}
+				else if (brett[neuX-1][neuY-1].hatStein()) {
+					return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[neuX-1][neuY-1].getStein());
+				}
+			}
+			
+			
 			
 			// wenn man auf der Grundlinie des Gegners ankommt, wird der eigene Stein zur
 			// Dame befördert
-			if ((neuY == 0 && stein.getType() == SteinTyp.WEISS) || (neuY == 7 && stein.getType() == SteinTyp.ROT)) {
+			if ((neuY == 0 && stein.getFarbe() == SteinFarbe.WEISS)
+					|| (neuY == 7 && stein.getFarbe() == SteinFarbe.ROT)) {
 				stein.werdeDame();
 			}
 			return new BewegungsErgebnis(BewegungTyp.NORMAL);
 		}
 
 		// wenn man zwei Felder nach vorne fahren will
-		else if (Math.abs(neuX - x0) == 2 && (neuY - y0 == stein.getType().richtung * 2 || stein.getType().richtung == 0)) {
+		else if (Math.abs(neuX - x0) == 2 && neuY - y0 == stein.getFarbe().richtung * 2) {
 
 			int x1 = x0 + (neuX - x0) / 2;
 			int y1 = y0 + (neuY - y0) / 2;
-                                                       
+
 			// zwei Felder nach vorne sind nur erlaubt, wenn man einen Gegner fressen kann
-			if (brett[x1][y1].hatStein() && brett[x1][y1].getStein().getType() != stein.getType()) {
-				
+			if (brett[x1][y1].hatStein() && brett[x1][y1].getStein().getFarbe() != stein.getFarbe()) {
+
 				// wenn man auf der Grundlinie des Gegners ankommt, wird der eigene Stein zur
 				// Dame befördert
-				if ((neuY == 0 && stein.getType() == SteinTyp.WEISS) || (neuY == 7 && stein.getType() == SteinTyp.ROT)) {
+				if ((neuY == 0 && stein.getFarbe() == SteinFarbe.WEISS)
+						|| (neuY == 7 && stein.getFarbe() == SteinFarbe.ROT)) {
 					stein.werdeDame();
 				}
 				return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x1][y1].getStein());
 			}
+			
 		}
 
 		return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 	}
-
-
 
 	public static void main(String[] args) {
 		launch(args);
