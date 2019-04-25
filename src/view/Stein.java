@@ -71,10 +71,10 @@ public class Stein extends StackPane {
 			this.typ = SteinTyp.DAMEWEISS;
 			System.out.println("Dame");
 			System.out.println(this.getType());
-			
+
 			// oberer Stein erzeugen
 			Ellipse ellipse = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);
-			ellipse.setFill(typ == SteinTyp.ROT ? Color.valueOf("#c40003") : Color.valueOf("#fff9f4"));
+			ellipse.setFill(Color.valueOf("#fff9f4"));
 
 			// Umrandung des oberen Steins
 			ellipse.setStroke(Color.BLACK);
@@ -89,17 +89,20 @@ public class Stein extends StackPane {
 		} else {
 			this.typ = SteinTyp.DAMEROT;
 			System.out.println("Dame");
-			
-			Ellipse bg = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);
-			bg.setFill(Color.BLACK);
-			
+
+			// oberer Stein erzeugen
 			Ellipse ellipse = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);
 			ellipse.setFill(Color.valueOf("#c40003"));
-			
+
+			// Umrandung des oberen Steins
 			ellipse.setStroke(Color.BLACK);
 			ellipse.setStrokeWidth(FELDGROESSE * 0.03);
-			
-			this.getChildren().addAll(bg,ellipse);
+
+			// Stein verschieben
+			ellipse.setTranslateX(10);
+			ellipse.setTranslateY(20);
+
+			this.getChildren().addAll(ellipse);
 		}
 	}
 
