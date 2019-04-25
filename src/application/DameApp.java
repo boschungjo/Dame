@@ -111,6 +111,9 @@ public class DameApp extends Application {
 	}
 
 	private BewegungsErgebnis versucheBewegung(Stein stein, int neuX, int neuY) {
+
+		// man darf nicht auf ein Feld auf welchem schon ein Stein ist und man darf
+		// nicht auf die weissen Felder
 		if (brett[neuX][neuY].hatStein() || (neuX + neuY) % 2 == 0) {
 			return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 		}
@@ -118,14 +121,31 @@ public class DameApp extends Application {
 		int x0 = zuBrett(stein.getAltX());
 		int y0 = zuBrett(stein.getAltY());
 
-		if (Math.abs(neuX - x0) == 1 && neuY - y0 == stein.getType().richtung) {
+		// man darf nur 1 Feld fahren und nur in die erlaubte Richtung
+		if (Math.abs(neuX - x0) == 1 && (neuY - y0 == stein.getType().richtung || stein.getType().richtung == 0)) {
+			
+			// wenn man auf der Grundlinie des Gegners ankommt, wird der eigene Stein zur
+			// Dame befördert
+			if ((neuY == 0 && stein.getType() == SteinTyp.WEISS) || (neuY == 7 && stein.getType() == SteinTyp.ROT)) {
+				stein.werdeDame();
+			}
 			return new BewegungsErgebnis(BewegungTyp.NORMAL);
-		} else if (Math.abs(neuX - x0) == 2 && neuY - y0 == stein.getType().richtung * 2) {
+		}
+
+		// wenn man zwei Felder nach vorne fahren will
+		else if (Math.abs(neuX - x0) == 2 && (neuY - y0 == stein.getType().richtung * 2 || stein.getType().richtung == 0)) {
 
 			int x1 = x0 + (neuX - x0) / 2;
 			int y1 = y0 + (neuY - y0) / 2;
-
+                                                       
+			// zwei Felder nach vorne sind nur erlaubt, wenn man einen Gegner fressen kann
 			if (brett[x1][y1].hatStein() && brett[x1][y1].getStein().getType() != stein.getType()) {
+				
+				// wenn man auf der Grundlinie des Gegners ankommt, wird der eigene Stein zur
+				// Dame befördert
+				if ((neuY == 0 && stein.getType() == SteinTyp.WEISS) || (neuY == 7 && stein.getType() == SteinTyp.ROT)) {
+					stein.werdeDame();
+				}
 				return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x1][y1].getStein());
 			}
 		}
