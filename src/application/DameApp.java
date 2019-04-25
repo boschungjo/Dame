@@ -133,9 +133,7 @@ public class DameApp extends Application {
 		return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 	}
 
-<<<<<<< HEAD
-	
-=======
+
 	private int zuBrett(double pixel) {
 		return (int) (pixel + FELDGROESSE / 2) / FELDGROESSE;
 	}
