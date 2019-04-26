@@ -146,7 +146,7 @@ public class DameApp extends Application {
 					for (int x = x0 + 1; x < neuX; x++) {
 						y0++;
 						if (brett[x][y0].hatStein()) {
-							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()) {
+							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe() || brett[x+1][y0+1].hatStein() ) {
 								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 							}
 							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
@@ -161,7 +161,7 @@ public class DameApp extends Application {
 					for (int x = x0 + 1; x < neuX; x++) {
 						y0--;
 						if (brett[x][y0].hatStein()) {
-							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()) {
+							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe() || brett[x+1][y0-1].hatStein()) {
 								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 							}
 							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
@@ -176,7 +176,7 @@ public class DameApp extends Application {
 					for (int x = x0 - 1; x > neuX; x--) {
 						y0++;
 						if (brett[x][y0].hatStein()) {
-							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()) {
+							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe() || brett[x-1][y0+1].hatStein()) {
 								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 							}
 							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
@@ -190,7 +190,7 @@ public class DameApp extends Application {
 					for (int x = x0 - 1; x > neuX; x--) {
 						y0--;
 						if (brett[x][y0].hatStein()) {
-							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()) {
+							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe() || brett[x-1][y0-1].hatStein()) {
 								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 							}
 							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
