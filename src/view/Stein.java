@@ -1,12 +1,11 @@
 package view;
 
+import static controller.DameApp.FELDGROESSE;
+
+import controller.DameApp;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.paint.Color;
-
-import static application.DameApp.FELDGROESSE;
-
-import application.DameApp;
 
 public class Stein extends StackPane {
 	private SteinFarbe farbe;

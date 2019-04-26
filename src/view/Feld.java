@@ -1,8 +1,8 @@
 package view;
 
+import controller.DameApp;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import application.DameApp;
 
 public class Feld extends Rectangle {
 
