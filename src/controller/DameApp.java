@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.Iterator;
+
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -116,74 +118,85 @@ public class DameApp extends Application {
 
 	// Methode, die prüft, ob eine Bewegung möglich ist
 	private BewegungsErgebnis versucheBewegung(Stein stein, int neuX, int neuY) {
-
+		
 		int x0 = zuBrett(stein.getAltX());
 		int y0 = zuBrett(stein.getAltY());
-
+		
+		
 		// Züge auf ein besetztes Feld oder auf ein helles Feld verhindern
 		if (brett[neuX][neuY].hatStein() || (neuX + neuY) % 2 == 0) {
 			return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 		}
-
+		
+		// man darf nur 1 Feld fahren und nur in die erlaubte Richtung (ausser Dame)
 		if ((Math.abs(neuX - x0) == 1 && neuY - y0 == stein.getFarbe().richtung)
 				|| (stein.getType() == SteinTyp.DAME && ((neuY - neuX == y0 - x0) || (neuX + neuY == x0 + y0)))) {
 			if (((neuY == 0 && stein.getFarbe() == SteinFarbe.WEISS)
 					|| (neuY == 7 && stein.getFarbe() == SteinFarbe.ROT)) && stein.getType() != SteinTyp.DAME) {
-				System.out.println("nicht gut");
 				stein.werdeDame();
 			}
 
 			else if (stein.getType() == SteinTyp.DAME) {
 
-				//if ((neuY - neuX == y0 - x0) || (neuX + neuY == x0 + y0)) {
-					System.out.println("gut");
+				System.out.println("gut");
 
-					// Dame-Bewegung nach rechts unten
-					if (neuX > x0 && neuY > y0) {
-						System.out.println("rechts unten");
-						for (int x = x0 + 1; x < neuX; x++) {
-							y0++;
-							if (brett[x][y0].hatStein()) {
-								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
+				// Dame-Bewegung nach rechts unten
+				if (neuX > x0 && neuY > y0) {
+					System.out.println("rechts unten");
+					for (int x = x0 + 1; x < neuX; x++) {
+						y0++;
+						if (brett[x][y0].hatStein()) {
+							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()) {
+								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 							}
+							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
+						}
 
+					}
+				}
+
+				// Dame-Bewegung nach rechts oben
+				else if (neuX > x0 && neuY < y0) {
+					System.out.println("rechts oben");
+					for (int x = x0 + 1; x < neuX; x++) {
+						y0--;
+						if (brett[x][y0].hatStein()) {
+							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()) {
+								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+							}
+							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
+						}
+
+					}
+				}
+
+				// Dame-Bewegung nach links unten
+				else if (neuX < x0 && neuY > y0) {
+					System.out.println("links unten");
+					for (int x = x0 - 1; x > neuX; x--) {
+						y0++;
+						if (brett[x][y0].hatStein()) {
+							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()) {
+								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+							}
+							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
 						}
 					}
+				}
 
-					// Dame-Bewegung nach rechts oben
-					else if (neuX > x0 && neuY < y0) {
-						System.out.println("rechts oben");
-						for (int x = x0 + 1; x < neuX; x++) {
-							y0--;
-							if (brett[x][y0].hatStein()) {
-								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
+				// Dame-Bewegung nach links oben
+				else if (neuX < x0 && neuY < y0) {
+					System.out.println("links oben");
+					for (int x = x0 - 1; x > neuX; x--) {
+						y0--;
+						if (brett[x][y0].hatStein()) {
+							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()) {
+								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 							}
-
+							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
 						}
 					}
-
-					// Dame-Bewegung nach links unten
-					else if (neuX < x0 && neuY > y0) {
-						System.out.println("links unten");
-						for (int x = x0 - 1; x > neuX; x--) {
-							y0++;
-							if (brett[x][y0].hatStein()) {
-								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
-							}
-						}
-					}
-					
-					// Dame-Bewegung nach links oben
-					else if (neuX < x0 && neuY < y0) {
-						System.out.println("links oben");
-						for (int x = x0 - 1; x > neuX; x--) {
-							y0--;
-							if (brett[x][y0].hatStein()) {
-								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
-							}
-						}
-					}
-				//}
+				}
 
 			}
 			return new BewegungsErgebnis(BewegungTyp.NORMAL);
@@ -195,38 +208,6 @@ public class DameApp extends Application {
 			return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 		}
 
-		// man darf nur 1 Feld fahren und nur in die erlaubte Richtung (ausser Dame)
-		if ((Math.abs(neuX - x0) == 1 && neuY - y0 == stein.getFarbe().richtung)
-				|| (stein.getType() == SteinTyp.DAME && ((neuY - neuX == y0 - x0) || (neuX + neuY == x0 + y0)))) {
-
-//			int summe = neuX + neuY;
-//			int dif = neuY - neuX;
-//			if (stein.getType() == SteinTyp.DAME) {
-//				for (int x = 0; x < brett.length; x++) {
-//				for (int y = 0; y < brett.length; y++) {
-//					if (brett[x][y].hatStein() && brett[x][y].getStein().getFarbe() != stein.getFarbe() && (x + y == summe || y - x == dif)) {
-//						return new BewegungsErgebnis(BewegungTyp.FRESSEN,brett[x][y].getStein());
-//					}
-//				}
-//			}
-//			}
-
-			if (stein.getType() == SteinTyp.DAME) {
-				if (brett[neuX + 1][neuY + 1].hatStein()) {
-					return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[neuX + 1][neuY + 1].getStein());
-				} else if (brett[neuX - 1][neuY - 1].hatStein()) {
-					return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[neuX - 1][neuY - 1].getStein());
-				}
-			}
-
-			// wenn man auf der Grundlinie des Gegners ankommt, wird der eigene Stein zur
-			// Dame befördert
-			if ((neuY == 0 && stein.getFarbe() == SteinFarbe.WEISS)
-					|| (neuY == 7 && stein.getFarbe() == SteinFarbe.ROT)) {
-				stein.werdeDame();
-			}
-			return new BewegungsErgebnis(BewegungTyp.NORMAL);
-		}
 
 		// wenn man zwei Felder nach vorne fahren will
 		else if (Math.abs(neuX - x0) == 2 && neuY - y0 == stein.getFarbe().richtung * 2) {
