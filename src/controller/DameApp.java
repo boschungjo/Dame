@@ -1,10 +1,13 @@
 package controller;
 
-
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import model.*;
@@ -19,9 +22,12 @@ public class DameApp extends Application {
 
 	private Group feldGruppe = new Group();
 	private Group steinGruppe = new Group();
-	
+
 	private Spieler spielerRot = new Spieler(SteinFarbe.ROT, false);
 	private Spieler spielerWeiss = new Spieler(SteinFarbe.WEISS, true);
+
+	private Stage primaryStage;
+	private Label infoLabel;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -29,21 +35,89 @@ public class DameApp extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		this.primaryStage = primaryStage;
 		try {
-			Scene scene = new Scene(erstelleFenster());
-			primaryStage.setTitle("DameApp");
-			primaryStage.setScene(scene);
+			erstelleStartseite();
+			// Scene scene = new Scene(erstelleStartseite());
+			// primaryStage.setTitle("DameApp");
+			// primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		erstelleStartseite();
+	}
+
+	private void erstelleStartseite() {
+
+		final Image titleScreen = new Image("checkers1.png", 700, 450, false, false);
+
+		final ImageView icon = new ImageView();
+		icon.setImage(titleScreen);
+		icon.setFitWidth(800);
+		icon.setFitHeight(500);
+
+		primaryStage.setTitle("D A M E S P I E L");
+		primaryStage.getIcons().add(titleScreen);
+
+		Pane root = new Pane();
+
+		TextField spieler1 = new TextField("Spieler 1");
+		spieler1.setMinSize(100, 25);
+		spieler1.setTranslateX(325);
+		spieler1.setTranslateY(550);
+
+		TextField spieler2 = new TextField("Spieler 2");
+		spieler1.setMinSize(100, 25);
+		spieler2.setTranslateX(325);
+		spieler2.setTranslateY(600);
+
+		Button startBtn = new Button("Spiel starten");
+		startBtn.setTranslateX(350);
+		startBtn.setTranslateY(700);
+		startBtn.setMinSize(100, 50);
+		EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				spielerWeiss.setName(spieler1.getText());
+				spielerRot.setName(spieler2.getText());
+				erstelleSpielfeld();
+			}
+		};
+
+		startBtn.setOnAction(eventHandler);
+
+		root.getChildren().addAll(icon, startBtn, spieler1, spieler2);
+
+		Scene startScene = new Scene(root, 800, 800);
+		primaryStage.setScene(startScene);
+
+	}
+
+	private void aktualisiereLabel() {
+		if (spielerRot.getAnDerReihe()) {
+			infoLabel.setText(spielerRot.getName() + " ( " + spielerRot.getFarbe() + " )" + " ist an der Reihe.");
+		} else {
+			infoLabel.setText(spielerWeiss.getName() + " ( " + spielerWeiss.getFarbe() + " )" + " ist an der Reihe");
+		}
 	}
 
 	// GUI erstellen
-	private Parent erstelleFenster() {
+	private void erstelleSpielfeld() {
 		Pane root = new Pane();
+		infoLabel = new Label();
+		infoLabel.setTranslateX(300);
+		infoLabel.setTranslateY(850);
+
+		if (spielerRot.getAnDerReihe()) {
+			infoLabel.setText(spielerRot.getName() + " ( " + spielerRot.getFarbe() + " )" + " ist an der Reihe.");
+		} else {
+			infoLabel.setText(spielerWeiss.getName() + " ( " + spielerWeiss.getFarbe() + " )" + " ist an der Reihe");
+		}
+
 		root.setPrefSize(BREITE * FELDGROESSE, HOEHE * FELDGROESSE);
-		root.getChildren().addAll(feldGruppe, steinGruppe);
+		root.getChildren().addAll(feldGruppe, steinGruppe, infoLabel);
 
 		for (int y = 0; y < HOEHE; y++) {
 			for (int x = 0; x < BREITE; x++) {
@@ -69,8 +143,7 @@ public class DameApp extends Application {
 
 			}
 		}
-
-		return root;
+		primaryStage.setScene(new Scene(root, 800, 900));
 	}
 
 	private int zuBrett(double pixel) {
@@ -114,7 +187,6 @@ public class DameApp extends Application {
 				break;
 			}
 		});
-		
 		return stein;
 	}
 
@@ -122,12 +194,11 @@ public class DameApp extends Application {
 	private BewegungsErgebnis versucheBewegung(Stein stein, int neuX, int neuY) {
 		Spieler spieler;
 		Spieler otherSpieler;
-		
+
 		if (spielerRot.getAnDerReihe()) {
 			spieler = spielerRot;
 			otherSpieler = spielerWeiss;
-		}
-		else {
+		} else {
 			spieler = spielerWeiss;
 			otherSpieler = spielerRot;
 		}
@@ -160,12 +231,13 @@ public class DameApp extends Application {
 							y0++;
 							if (brett[x][y0].hatStein()) {
 								if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()
-										|| brett[x + 1][y0 + 1].hatStein()) {
+										|| brett[x + 1][y0 + 1].hatStein() || (neuX - x > 1)) {
 									return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 								}
-								
+
 								spieler.setAnDerReihe(false);
 								otherSpieler.setAnDerReihe(true);
+								aktualisiereLabel();
 								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
 							}
 
@@ -179,11 +251,12 @@ public class DameApp extends Application {
 							y0--;
 							if (brett[x][y0].hatStein()) {
 								if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()
-										|| brett[x + 1][y0 - 1].hatStein()) {
+										|| brett[x + 1][y0 - 1].hatStein() || (neuX - x > 1)) {
 									return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 								}
 								spieler.setAnDerReihe(false);
 								otherSpieler.setAnDerReihe(true);
+								aktualisiereLabel();
 								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
 							}
 
@@ -197,11 +270,12 @@ public class DameApp extends Application {
 							y0++;
 							if (brett[x][y0].hatStein()) {
 								if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()
-										|| brett[x - 1][y0 + 1].hatStein()) {
+										|| brett[x - 1][y0 + 1].hatStein() || Math.abs(neuX - x) > 1) {
 									return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 								}
 								spieler.setAnDerReihe(false);
 								otherSpieler.setAnDerReihe(true);
+								aktualisiereLabel();
 								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
 							}
 						}
@@ -214,11 +288,12 @@ public class DameApp extends Application {
 							y0--;
 							if (brett[x][y0].hatStein()) {
 								if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()
-										|| brett[x - 1][y0 - 1].hatStein()) {
+										|| brett[x - 1][y0 - 1].hatStein() || Math.abs(neuX - x) > 1) {
 									return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 								}
 								spieler.setAnDerReihe(false);
 								otherSpieler.setAnDerReihe(true);
+								aktualisiereLabel();
 								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
 							}
 						}
@@ -227,6 +302,7 @@ public class DameApp extends Application {
 				}
 				spieler.setAnDerReihe(false);
 				otherSpieler.setAnDerReihe(true);
+				aktualisiereLabel();
 				return new BewegungsErgebnis(BewegungTyp.NORMAL);
 
 			}
@@ -254,14 +330,14 @@ public class DameApp extends Application {
 					}
 					spieler.setAnDerReihe(false);
 					otherSpieler.setAnDerReihe(true);
+					aktualisiereLabel();
 					return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x1][y1].getStein());
 				}
 
 			}
 		}
 
-			return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
-		}
-	
+		return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+	}
 
 }

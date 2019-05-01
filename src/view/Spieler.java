@@ -1,8 +1,11 @@
 package view;
 
+import controller.DameApp;
+
 public class Spieler {
 	private boolean anDerReihe;
 	private SteinFarbe farbe;
+	private String name;
 
 	public Spieler(SteinFarbe farbe, boolean anDerReihe) {
 		this.farbe = farbe;
@@ -23,6 +26,14 @@ public class Spieler {
 
 	public void setFarbe(SteinFarbe farbe) {
 		this.farbe = farbe;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	
