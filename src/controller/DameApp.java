@@ -1,6 +1,5 @@
 package controller;
 
-import java.util.Iterator;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -20,6 +19,9 @@ public class DameApp extends Application {
 
 	private Group feldGruppe = new Group();
 	private Group steinGruppe = new Group();
+	
+	private Spieler spielerRot = new Spieler(SteinFarbe.ROT, false);
+	private Spieler spielerWeiss = new Spieler(SteinFarbe.WEISS, true);
 
 	public static void main(String[] args) {
 		launch(args);
@@ -112,124 +114,154 @@ public class DameApp extends Application {
 				break;
 			}
 		});
-
+		
 		return stein;
 	}
 
 	// Methode, die prüft, ob eine Bewegung möglich ist
 	private BewegungsErgebnis versucheBewegung(Stein stein, int neuX, int neuY) {
+		Spieler spieler;
+		Spieler otherSpieler;
 		
-		int x0 = zuBrett(stein.getAltX());
-		int y0 = zuBrett(stein.getAltY());
-		
-		
-		// Züge auf ein besetztes Feld oder auf ein helles Feld verhindern
-		if (brett[neuX][neuY].hatStein() || (neuX + neuY) % 2 == 0) {
-			return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+		if (spielerRot.getAnDerReihe()) {
+			spieler = spielerRot;
+			otherSpieler = spielerWeiss;
 		}
-		
-		// man darf nur 1 Feld fahren und nur in die erlaubte Richtung (ausser Dame)
-		if ((Math.abs(neuX - x0) == 1 && neuY - y0 == stein.getFarbe().richtung)
-				|| (stein.getType() == SteinTyp.DAME && ((neuY - neuX == y0 - x0) || (neuX + neuY == x0 + y0)))) {
-			if (((neuY == 0 && stein.getFarbe() == SteinFarbe.WEISS)
-					|| (neuY == 7 && stein.getFarbe() == SteinFarbe.ROT)) && stein.getType() != SteinTyp.DAME) {
-				stein.werdeDame();
+		else {
+			spieler = spielerWeiss;
+			otherSpieler = spielerRot;
+		}
+		if (stein.getFarbe() == spieler.getFarbe()) {
+
+			int x0 = zuBrett(stein.getAltX());
+			int y0 = zuBrett(stein.getAltY());
+
+			// Züge auf ein besetztes Feld oder auf ein helles Feld verhindern
+			if (brett[neuX][neuY].hatStein() || (neuX + neuY) % 2 == 0) {
+				return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
 			}
 
-			else if (stein.getType() == SteinTyp.DAME) {
-
-				System.out.println("gut");
-
-				// Dame-Bewegung nach rechts unten
-				if (neuX > x0 && neuY > y0) {
-					System.out.println("rechts unten");
-					for (int x = x0 + 1; x < neuX; x++) {
-						y0++;
-						if (brett[x][y0].hatStein()) {
-							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe() || brett[x+1][y0+1].hatStein() ) {
-								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
-							}
-							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
-						}
-
-					}
-				}
-
-				// Dame-Bewegung nach rechts oben
-				else if (neuX > x0 && neuY < y0) {
-					System.out.println("rechts oben");
-					for (int x = x0 + 1; x < neuX; x++) {
-						y0--;
-						if (brett[x][y0].hatStein()) {
-							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe() || brett[x+1][y0-1].hatStein()) {
-								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
-							}
-							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
-						}
-
-					}
-				}
-
-				// Dame-Bewegung nach links unten
-				else if (neuX < x0 && neuY > y0) {
-					System.out.println("links unten");
-					for (int x = x0 - 1; x > neuX; x--) {
-						y0++;
-						if (brett[x][y0].hatStein()) {
-							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe() || brett[x-1][y0+1].hatStein()) {
-								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
-							}
-							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
-						}
-					}
-				}
-
-				// Dame-Bewegung nach links oben
-				else if (neuX < x0 && neuY < y0) {
-					System.out.println("links oben");
-					for (int x = x0 - 1; x > neuX; x--) {
-						y0--;
-						if (brett[x][y0].hatStein()) {
-							if (brett[x][y0].getStein().getFarbe() == stein.getFarbe() || brett[x-1][y0-1].hatStein()) {
-								return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
-							}
-							return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
-						}
-					}
-				}
-
-			}
-			return new BewegungsErgebnis(BewegungTyp.NORMAL);
-		}
-
-		// man darf nicht auf ein Feld auf welchem schon ein Stein ist und man darf
-		// nicht auf die weissen Felder
-		if (brett[neuX][neuY].hatStein() || (neuX + neuY) % 2 == 0) {
-			return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
-		}
-
-
-		// wenn man zwei Felder nach vorne fahren will
-		else if (Math.abs(neuX - x0) == 2 && neuY - y0 == stein.getFarbe().richtung * 2) {
-
-			int x1 = x0 + (neuX - x0) / 2;
-			int y1 = y0 + (neuY - y0) / 2;
-
-			// zwei Felder nach vorne sind nur erlaubt, wenn man einen Gegner fressen kann
-			if (brett[x1][y1].hatStein() && brett[x1][y1].getStein().getFarbe() != stein.getFarbe()) {
-
-				// wenn man auf der Grundlinie des Gegners ankommt, wird der eigene Stein zur
-				// Dame befördert
-				if ((neuY == 0 && stein.getFarbe() == SteinFarbe.WEISS)
-						|| (neuY == 7 && stein.getFarbe() == SteinFarbe.ROT)) {
+			// man darf nur 1 Feld fahren und nur in die erlaubte Richtung (ausser Dame)
+			if ((Math.abs(neuX - x0) == 1 && neuY - y0 == stein.getFarbe().richtung)
+					|| (stein.getType() == SteinTyp.DAME && ((neuY - neuX == y0 - x0) || (neuX + neuY == x0 + y0)))) {
+				if (((neuY == 0 && stein.getFarbe() == SteinFarbe.WEISS)
+						|| (neuY == 7 && stein.getFarbe() == SteinFarbe.ROT)) && stein.getType() != SteinTyp.DAME) {
 					stein.werdeDame();
 				}
-				return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x1][y1].getStein());
+
+				else if (stein.getType() == SteinTyp.DAME) {
+
+					System.out.println("gut");
+
+					// Dame-Bewegung nach rechts unten
+					if (neuX > x0 && neuY > y0) {
+						System.out.println("rechts unten");
+						for (int x = x0 + 1; x < neuX; x++) {
+							y0++;
+							if (brett[x][y0].hatStein()) {
+								if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()
+										|| brett[x + 1][y0 + 1].hatStein()) {
+									return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+								}
+								
+								spieler.setAnDerReihe(false);
+								otherSpieler.setAnDerReihe(true);
+								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
+							}
+
+						}
+					}
+
+					// Dame-Bewegung nach rechts oben
+					else if (neuX > x0 && neuY < y0) {
+						System.out.println("rechts oben");
+						for (int x = x0 + 1; x < neuX; x++) {
+							y0--;
+							if (brett[x][y0].hatStein()) {
+								if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()
+										|| brett[x + 1][y0 - 1].hatStein()) {
+									return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+								}
+								spieler.setAnDerReihe(false);
+								otherSpieler.setAnDerReihe(true);
+								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
+							}
+
+						}
+					}
+
+					// Dame-Bewegung nach links unten
+					else if (neuX < x0 && neuY > y0) {
+						System.out.println("links unten");
+						for (int x = x0 - 1; x > neuX; x--) {
+							y0++;
+							if (brett[x][y0].hatStein()) {
+								if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()
+										|| brett[x - 1][y0 + 1].hatStein()) {
+									return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+								}
+								spieler.setAnDerReihe(false);
+								otherSpieler.setAnDerReihe(true);
+								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
+							}
+						}
+					}
+
+					// Dame-Bewegung nach links oben
+					else if (neuX < x0 && neuY < y0) {
+						System.out.println("links oben");
+						for (int x = x0 - 1; x > neuX; x--) {
+							y0--;
+							if (brett[x][y0].hatStein()) {
+								if (brett[x][y0].getStein().getFarbe() == stein.getFarbe()
+										|| brett[x - 1][y0 - 1].hatStein()) {
+									return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+								}
+								spieler.setAnDerReihe(false);
+								otherSpieler.setAnDerReihe(true);
+								return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x][y0].getStein());
+							}
+						}
+					}
+
+				}
+				spieler.setAnDerReihe(false);
+				otherSpieler.setAnDerReihe(true);
+				return new BewegungsErgebnis(BewegungTyp.NORMAL);
+
 			}
 
+			// man darf nicht auf ein Feld auf welchem schon ein Stein ist und man darf
+			// nicht auf die weissen Felder
+			if (brett[neuX][neuY].hatStein() || (neuX + neuY) % 2 == 0) {
+				return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+			}
+
+			// wenn man zwei Felder nach vorne fahren will
+			else if (Math.abs(neuX - x0) == 2 && neuY - y0 == stein.getFarbe().richtung * 2) {
+
+				int x1 = x0 + (neuX - x0) / 2;
+				int y1 = y0 + (neuY - y0) / 2;
+
+				// zwei Felder nach vorne sind nur erlaubt, wenn man einen Gegner fressen kann
+				if (brett[x1][y1].hatStein() && brett[x1][y1].getStein().getFarbe() != stein.getFarbe()) {
+
+					// wenn man auf der Grundlinie des Gegners ankommt, wird der eigene Stein zur
+					// Dame befördert
+					if ((neuY == 0 && stein.getFarbe() == SteinFarbe.WEISS)
+							|| (neuY == 7 && stein.getFarbe() == SteinFarbe.ROT)) {
+						stein.werdeDame();
+					}
+					spieler.setAnDerReihe(false);
+					otherSpieler.setAnDerReihe(true);
+					return new BewegungsErgebnis(BewegungTyp.FRESSEN, brett[x1][y1].getStein());
+				}
+
+			}
 		}
 
-		return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
-	}
+			return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
+		}
+	
 
 }
