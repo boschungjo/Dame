@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -50,12 +51,10 @@ public class DameApp extends Application {
 
 	private void erstelleStartseite() {
 
-		final Image titleScreen = new Image("checkers1.png", 700, 450, false, false);
+		final Image titleScreen = new Image("checkers1.png", 800, 500, false, false);
 
 		final ImageView icon = new ImageView();
 		icon.setImage(titleScreen);
-		icon.setFitWidth(800);
-		icon.setFitHeight(500);
 
 		primaryStage.setTitle("D A M E S P I E L");
 		primaryStage.getIcons().add(titleScreen);
@@ -107,14 +106,12 @@ public class DameApp extends Application {
 	private void erstelleSpielfeld() {
 		Pane root = new Pane();
 		infoLabel = new Label();
+
+		infoLabel.setMinWidth(200);
 		infoLabel.setTranslateX(300);
 		infoLabel.setTranslateY(850);
 
-		if (spielerRot.getAnDerReihe()) {
-			infoLabel.setText(spielerRot.getName() + " ( " + spielerRot.getFarbe() + " )" + " ist an der Reihe.");
-		} else {
-			infoLabel.setText(spielerWeiss.getName() + " ( " + spielerWeiss.getFarbe() + " )" + " ist an der Reihe");
-		}
+		infoLabel.setText(spielerWeiss.getName() + " ( " + spielerWeiss.getFarbe() + " )" + " ist an der Reihe");
 
 		root.setPrefSize(BREITE * FELDGROESSE, HOEHE * FELDGROESSE);
 		root.getChildren().addAll(feldGruppe, steinGruppe, infoLabel);
@@ -207,6 +204,12 @@ public class DameApp extends Application {
 			int x0 = zuBrett(stein.getAltX());
 			int y0 = zuBrett(stein.getAltY());
 
+			
+			for (Node stNode : steinGruppe.getChildren()) {
+				//Abfrage ob irgend ein Stein gefressen werden kann. Wenn ja, alle andere Züge blockieren!!!
+			}
+			
+						
 			// Züge auf ein besetztes Feld oder auf ein helles Feld verhindern
 			if (brett[neuX][neuY].hatStein() || (neuX + neuY) % 2 == 0) {
 				return new BewegungsErgebnis(BewegungTyp.VERBOTEN);
