@@ -1,6 +1,5 @@
 package controller;
 
-import javax.swing.RootPaneContainer;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;

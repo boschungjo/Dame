@@ -2,7 +2,6 @@ package view;
 
 import static controller.DameApp.FELDGROESSE;
 
-import controller.DameApp;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Ellipse;
 import model.SteinFarbe;
@@ -65,7 +64,7 @@ public class Stein extends StackPane {
 			relocate(event.getSceneX() - mausX + altX, event.getSceneY() - mausY + altY);
 		});
 	}
-
+	
 	/**
 	 * 
 	 * Methode, welche einen Stein auf ein neues Feld bewegt
@@ -78,7 +77,7 @@ public class Stein extends StackPane {
 		altY = y * FELDGROESSE;
 		relocate(altX, altY);
 	}
-
+	
 	/**
 	 * Methode, welche einen Stein auf das alte Feld zurücksetzt
 	 */
@@ -92,7 +91,7 @@ public class Stein extends StackPane {
 	public void werdeDame() {
 
 		this.typ = SteinTyp.DAME;
-
+		
 		// oberer Stein erzeugen
 		Ellipse ellipse = new Ellipse(FELDGROESSE * 0.3125, FELDGROESSE * 0.26);
 
