@@ -1,17 +1,24 @@
-package view;
+package model;
 
-import controller.DameApp;
-
+/**
+ * 
+ * die Klasse welche einen Spieler und seine Eigenschaften beschreibt
+ * 
+ * @author boschungjo
+ * @author radonjicl
+ */
 public class Spieler {
 	private boolean anDerReihe;
 	private SteinFarbe farbe;
 	private String name;
 
+	// Konstruktor
 	public Spieler(SteinFarbe farbe, boolean anDerReihe) {
 		this.farbe = farbe;
 		this.anDerReihe = anDerReihe;
 	}
 
+	// Getter und Setter
 	public boolean getAnDerReihe() {
 		return anDerReihe;
 	}
@@ -35,6 +42,5 @@ public class Spieler {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
+
 }
